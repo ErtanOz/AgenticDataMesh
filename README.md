@@ -44,6 +44,28 @@ Willkommen im Repository zur Visualisierung und Dokumentation des Konzepts *Agen
 ## 📁 Projektstruktur
 
 ```plaintext
+
+## 📦 Technologien
+
+- **HTML5**  
+- **CSS (Tailwind)**  
+- **JavaScript** (modular & interaktiv)  
+- **GitHub Pages** – für Hosting & Präsentation  
+
+---
+
+## 🧠 Autor & Kontakt
+
+Projekt von **Ertan Öz** – Smart City & Data Governance Enthusiast bei der Stadt Köln.
+
+📬 Kontakt: [GitHub Profil](https://github.com/ErtanOz)
+
+---
+
+## 📄 Lizenz
+
+Dieses Projekt steht unter der **MIT License**.
+
 /
 ├── index.html              # Hauptseite mit Architektur-Visualisierung
 ├── css/                    # Stildefinitionen (Tailwind)
