@@ -49,7 +49,9 @@ Willkommen im Repository zur Visualisierung und Dokumentation des Konzepts *Agen
 - **HTML5**  
 - **CSS (Tailwind)**  
 - **JavaScript** (modular & interaktiv)  
-- **GitHub Pages** – für Hosting & Präsentation  
+- **GitHub Pages** – für Hosting & Präsentation
+  ![image](https://github.com/user-attachments/assets/3200ca32-60fb-4e8e-9825-d3102c167107)
+
 
 ---
 
