@@ -55,7 +55,7 @@ Willkommen im Repository zur Visualisierung und Dokumentation des Konzepts *Agen
 
 ## 🧠 Autor & Kontakt
 
-Projekt von **Ertan Öz** – Smart City & Data Governance Enthusiast bei der Stadt Köln.
+Projekt von **Ertan Ö.** – Smart City & Data Governance Enthusiast bei der Stadt Köln.
 
 📬 Kontakt: [GitHub Profil](https://github.com/ErtanOz)
 
