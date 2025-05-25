@@ -65,6 +65,8 @@ Projekt von **Ertan Öz** – Smart City & Data Governance Enthusiast bei der St
 
 Dieses Projekt steht unter der **MIT License**.
 
+
+```plaintext
 /
 ├── index.html              # Hauptseite mit Architektur-Visualisierung
 ├── css/                    # Stildefinitionen (Tailwind)
