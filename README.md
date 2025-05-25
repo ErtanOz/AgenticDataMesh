@@ -43,7 +43,6 @@ Willkommen im Repository zur Visualisierung und Dokumentation des Konzepts *Agen
 
 ## 📁 Projektstruktur
 
-```plaintext
 
 ## 📦 Technologien
 
