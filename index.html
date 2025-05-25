@@ -1,0 +1,2225 @@
+
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-blue: #2563eb;
+            --layer-purple: #9333ea;
+            --layer-blue: #2563eb;
+            --layer-green: #16a34a;
+            --layer-amber: #f59e0b;
+            --layer-red: #dc2626;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e0e7ff 100%);
+            min-height: 100vh;
+        }
+        
+        .layer {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .layer:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .component {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .component:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .arrow {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow svg {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+        
+        .active-layer {
+            border: 3px solid var(--primary-blue);
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        
+        .hidden-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        
+        .expanded .hidden-content {
+            max-height: 1500px;
+            opacity: 1;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.2s;
+        }
+        
+        .rotate-icon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .expanded .rotate-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layer {
+                margin-left: -10px;
+                margin-right: -10px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+        }
+    
+
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Data Mesh Architektur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-blue: #2563eb;
+            --layer-purple: #9333ea;
+            --layer-blue: #2563eb;
+            --layer-green: #16a34a;
+            --layer-amber: #f59e0b;
+            --layer-red: #dc2626;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e0e7ff 100%);
+            min-height: 100vh;
+        }
+        
+        .layer {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .layer:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .component {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .component:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .arrow {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow svg {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+        
+        .active-layer {
+            border: 3px solid var(--primary-blue);
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        
+        .hidden-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        
+        .expanded .hidden-content {
+            max-height: 1500px;
+            opacity: 1;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.2s;
+        }
+        
+        .rotate-icon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .expanded .rotate-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layer {
+                margin-left: -10px;
+                margin-right: -10px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-8 rounded-xl mb-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-black opacity-10"></div>
+                <div class="relative z-10">
+                    <h1 class="text-3xl md:text-4xl font-bold text-center mb-2">
+                        🧠 AGENTIC DATA MESH ARCHITEKTUR
+                    </h1>
+                    <p class="text-center text-blue-100 text-lg">
+                        Urbane Datenarchitektur für intelligentes Datenökosystem
+                    </p>
+                    <div class="mt-6 flex flex-wrap justify-center gap-4">
+                        <button onclick="showModal('info')" class="bg-white text-blue-700 px-6 py-2 rounded-full font-medium hover:bg-blue-50 transition-colors">
+                            ℹ️ Mehr erfahren
+                        </button>
+                        <button onclick="exportArchitecture()" class="bg-blue-800 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-900 transition-colors">
+                            📥 Exportieren
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-blue-600">5</div>
+                    <div class="text-sm text-gray-600">Architektur-Ebenen</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-green-600">7</div>
+                    <div class="text-sm text-gray-600">AI-Agenten</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-amber-600">3</div>
+                    <div class="text-sm text-gray-600">Datendomänen</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                    <div class="text-3xl font-bold text-red-600">4</div>
+                    <div class="text-sm text-gray-600">Use Cases</div>
+                </div>
+            </div>
+
+            <!-- Architecture Visualization -->
+            <div class="space-y-6 relative">
+                <!-- Layer 5: Interface & Clients -->
+                <div id="layer5" class="layer bg-white rounded-lg p-6 shadow-lg border-l-4 border-purple-500">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayer('layer5')">
+                        <h2 class="text-xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Layer 5</span>
+                            INTERFACE & CLIENTS
+                        </h2>
+                        <svg class="w-6 h-6 text-gray-500 rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden-content mt-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="component bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-lg shadow-md cursor-pointer" onclick="showDemo('dashboard')">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-purple-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Dashboard</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">Zentrale Übersicht aller Datenströme</p>
+                                <div class="mt-3 text-purple-600 text-sm font-medium">→ Demo anzeigen</div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-lg shadow-md cursor-pointer" onclick="showDemo('chatbot')">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-purple-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Chatbot</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">KI-gestützte Benutzerinteraktion</p>
+                                <div class="mt-3 text-purple-600 text-sm font-medium">→ Chat starten</div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-purple-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Mobile App</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">Zugriff von unterwegs</p>
+                                <div class="mt-3">
+                                    <span class="bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full">iOS</span>
+                                    <span class="bg-purple-200 text-purple-700 text-xs px-2 py-1 rounded-full ml-1">Android</span>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-purple-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Externe Clients</h3>
+                                </div>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li class="flex items-center">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                        Verwaltungsportale
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                        Fachämter
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                        Bürgerdienste
+                                    </li>
+                                    <li class="flex items-center">
+                                        <span class="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                        Forschungsinstitute
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+
+                <!-- Layer 1: Governance -->
+                <div id="layer1" class="layer bg-white rounded-lg p-6 shadow-lg border-l-4 border-blue-500">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayer('layer1')">
+                        <h2 class="text-xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Layer 1</span>
+                            GOVERNANCE LAYER
+                        </h2>
+                        <svg class="w-6 h-6 text-gray-500 rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden-content mt-6">
+                        <p class="text-gray-600 mb-4">Steuerung und Compliance für die gesamte Datenarchitektur</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="component bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-blue-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Datenstrategie & Richtlinien</h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-3 rounded shadow-sm">
+                                        <div class="font-medium text-blue-700">EU AI Act</div>
+                                        <div class="text-xs text-gray-500">Compliance für KI-Systeme</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded shadow-sm">
+                                        <div class="font-medium text-blue-700">DSGVO</div>
+                                        <div class="text-xs text-gray-500">Datenschutz-Grundverordnung</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-blue-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Rollen & Verantwortlichkeiten</h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-white p-2 rounded shadow-sm">
+                                        <span class="font-medium text-gray-700">CDO</span>
+                                        <span class="text-xs bg-blue-200 text-blue-700 px-2 py-1 rounded-full">Chief Data Officer</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white p-2 rounded shadow-sm">
+                                        <span class="font-medium text-gray-700">Data Steward</span>
+                                        <span class="text-xs bg-blue-200 text-blue-700 px-2 py-1 rounded-full">Datenverwalter</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white p-2 rounded shadow-sm">
+                                        <span class="font-medium text-gray-700">Compliance Officer</span>
+                                        <span class="text-xs bg-blue-200 text-blue-700 px-2 py-1 rounded-full">Compliance</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-blue-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Auditierbarkeit & Rechenschaft</h3>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="bg-white p-3 rounded shadow-sm cursor-pointer hover:shadow-md transition-shadow" onclick="showModal('monitoring')">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-medium text-gray-700">KI-Agent Monitoring</span>
+                                            <span class="text-green-500">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">Click für Live-Dashboard</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded shadow-sm">
+                                        <div class="font-medium text-gray-700">RACI-Matrix</div>
+                                        <div class="text-xs text-gray-500">Verantwortlichkeiten definiert</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+
+                <!-- Layer 2: Agentic Layer -->
+                <div id="layer2" class="layer bg-white rounded-lg p-6 shadow-lg border-l-4 border-green-500">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayer('layer2')">
+                        <h2 class="text-xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Layer 2</span>
+                            AGENTIC LAYER
+                        </h2>
+                        <svg class="w-6 h-6 text-gray-500 rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden-content mt-6">
+                        <p class="text-gray-600 mb-4">Intelligente Koordination & Automatisierung durch AI-Agenten</p>
+                        
+                        <!-- Agent Flow Diagram -->
+                        <div class="bg-green-50 p-4 rounded-lg mb-6">
+                            <div class="flex items-center justify-center space-x-4">
+                                <div class="text-center">
+                                    <div class="bg-green-600 text-white p-4 rounded-lg font-medium">
+                                        Zentraler Planungsagent
+                                    </div>
+                                </div>
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                                <div class="text-center">
+                                    <div class="bg-green-600 text-white p-4 rounded-lg font-medium">
+                                        Executor-Agent
+                                    </div>
+                                </div>
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                                <div class="text-center">
+                                    <div class="bg-green-600 text-white p-4 rounded-lg font-medium">
+                                        Meta-Agenten
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            <div class="component bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-green-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Zentraler Planungsagent</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3">Koordiniert alle Datenanfragen und plant optimale Verarbeitungspfade</p>
+                                <button onclick="showAgentDemo('planner')" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors">
+                                    Agent aktivieren
+                                </button>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-green-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Executor-Agent</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3">Multi-Agent Orchestrierung für komplexe Datenverarbeitung</p>
+                                <div class="bg-white p-2 rounded text-center">
+                                    <span class="text-2xl font-bold text-green-600">12</span>
+                                    <p class="text-xs text-gray-500">Aktive Prozesse</p>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-green-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Meta-Agenten</h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                        <span class="text-sm">Überwachen</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                        <span class="text-sm">Adaptieren</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                        <span class="text-sm">Optimieren</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Domain Agents Section -->
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg mb-6">
+                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Domänenagenten
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="showAgentDemo('project')">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-700">Projektanalyse-Agent</h4>
+                                        <div class="tooltip">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="tooltip-text">Analysiert Projektdaten und identifiziert Muster</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        <div class="flex justify-between items-center">
+                                            <span>Status:</span>
+                                            <span class="text-green-600 font-medium">Aktiv</span>
+                                        </div>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span>Analysierte Projekte:</span>
+                                            <span class="font-bold">247</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="showAgentDemo('risk')">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-700">Risikoagent</h4>
+                                        <div class="tooltip">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="tooltip-text">Bewertet und überwacht Risiken in Echtzeit</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        <div class="flex justify-between items-center">
+                                            <span>Status:</span>
+                                            <span class="text-green-600 font-medium">Aktiv</span>
+                                        </div>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span>Identifizierte Risiken:</span>
+                                            <span class="font-bold text-red-600">23</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="showAgentDemo('procurement')">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-gray-700">Beschaffungs-Agent</h4>
+                                        <div class="tooltip">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="tooltip-text">Optimiert Beschaffungsprozesse mit KI</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        <div class="flex justify-between items-center">
+                                            <span>Status:</span>
+                                            <span class="text-green-600 font-medium">Aktiv</span>
+                                        </div>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span>Einsparungen:</span>
+                                            <span class="font-bold text-green-600">€1.2M</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Uncertainty Module -->
+                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-5 rounded-lg shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="flex items-center mb-2">
+                                        <div class="bg-yellow-600 p-3 rounded-lg mr-3">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Uncertainty Module</h3>
+                                            <p class="text-sm text-gray-600">Identifiziert und behandelt Unsicherheiten</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-yellow-600">87%</div>
+                                    <div class="text-xs text-gray-500">Confidence Level</div>
+                                </div>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div class="bg-white p-3 rounded flex justify-between items-center">
+                                    <span class="text-sm">Wissenslücken identifiziert</span>
+                                    <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">12</span>
+                                </div>
+                                <div class="bg-white p-3 rounded flex justify-between items-center">
+                                    <span class="text-sm">Unsicherheiten behoben</span>
+                                    <span class="bg-green-200 text-green-800 px-2 py-1 rounded-full text-xs font-medium">45</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+
+                <!-- Layer 3: Data Mesh -->
+                <div id="layer3" class="layer bg-white rounded-lg p-6 shadow-lg border-l-4 border-amber-500">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayer('layer3')">
+                        <h2 class="text-xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                            <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Layer 3</span>
+                            DATA MESH LAYER
+                        </h2>
+                        <svg class="w-6 h-6 text-gray-500 rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden-content mt-6">
+                        <p class="text-gray-600 mb-4">Dezentrale Datenverwaltung mit domänenorientierten Teams</p>
+                        
+                        <!-- Data Domains -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="component bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-lg shadow-md cursor-pointer" onclick="showDataDomain('traffic')">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-amber-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Verkehrsdaten</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">→ Mobilitätsamt</p>
+                                <div class="bg-white p-3 rounded">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-500">Datenpunkte</span>
+                                        <span class="font-bold text-amber-600">2.4M</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-amber-600 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">75% Verfügbarkeit</p>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-lg shadow-md cursor-pointer" onclick="showDataDomain('environment')">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-amber-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Umwelt-/Luftdaten</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">→ Umweltamt</p>
+                                <div class="bg-white p-3 rounded">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-500">Sensoren</span>
+                                        <span class="font-bold text-amber-600">156</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                        <span class="text-xs text-green-600">Live-Daten aktiv</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-lg shadow-md cursor-pointer" onclick="showDataDomain('energy')">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-amber-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Energieverbrauch</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">→ Gebäudemanagement</p>
+                                <div class="bg-white p-3 rounded">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-500">Gebäude</span>
+                                        <span class="font-bold text-amber-600">342</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-500">Einsparung</span>
+                                        <span class="font-bold text-green-600">-12%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Data as Product -->
+                        <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-lg mb-6">
+                            <div class="flex items-center mb-4">
+                                <svg class="w-6 h-6 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                <h3 class="font-semibold text-gray-800">Daten als Produkt</h3>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-8 h-8 text-amber-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Dokumentation</p>
+                                    <p class="text-xs text-gray-500 mt-1">Vollständig & aktuell</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-8 h-8 text-amber-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">SLA</p>
+                                    <p class="text-xs text-gray-500 mt-1">99.9% Uptime</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-8 h-8 text-amber-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Eigentümer</p>
+                                    <p class="text-xs text-gray-500 mt-1">Klar definiert</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-8 h-8 text-amber-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Self-Service</p>
+                                    <p class="text-xs text-gray-500 mt-1">Tools verfügbar</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Federated Governance -->
+                        <div class="bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 rounded-lg text-center">
+                            <h3 class="font-semibold text-lg mb-2">Föderierte Governance</h3>
+                            <p class="text-amber-100">Zentrale Standards, lokale Implementierung</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+
+                <!-- Layer 4: Data Platform -->
+                <div id="layer4" class="layer bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+                    <div class="flex justify-between items-center cursor-pointer" onclick="toggleLayer('layer4')">
+                        <h2 class="text-xl md:text-2xl font-semibold text-gray-800 flex items-center">
+                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium mr-3">Layer 4</span>
+                            DATA PLATFORM LAYER
+                        </h2>
+                        <svg class="w-6 h-6 text-gray-500 rotate-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden-content mt-6">
+                        <p class="text-gray-600 mb-4">Technologische Infrastruktur für moderne Datenverarbeitung</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            <div class="component bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-red-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Wissensdatenbank</h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-2 rounded flex items-center justify-between">
+                                        <span class="text-sm">Data Lake</span>
+                                        <span class="text-xs bg-red-200 text-red-700 px-2 py-1 rounded-full">15TB</span>
+                                    </div>
+                                    <div class="bg-white p-2 rounded flex items-center justify-between">
+                                        <span class="text-sm">Azure Purview</span>
+                                        <span class="text-xs bg-green-200 text-green-700 px-2 py-1 rounded-full">Aktiv</span>
+                                    </div>
+                                    <div class="bg-white p-2 rounded">
+                                        <span class="text-sm">Projekte & Assets</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-red-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Externe APIs</h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-2 rounded">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm">Open Data Portale</span>
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm">Webscraping</span>
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white p-2 rounded">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm">IoT-Feeds</span>
+                                            <span class="text-xs font-bold">1.2k/s</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="component bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-lg shadow-md">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-red-600 p-3 rounded-lg mr-3">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-semibold text-gray-800">Knowledge Graph</h3>
+                                </div>
+                                <div class="bg-white p-3 rounded">
+                                    <div class="text-center mb-2">
+                                        <span class="text-3xl font-bold text-red-600">2.4M</span>
+                                        <p class="text-xs text-gray-500">Verknüpfungen</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <div class="bg-red-50 p-2 rounded text-center">
+                                            <div class="font-bold">Entities</div>
+                                            <div class="text-gray-600">345k</div>
+                                        </div>
+                                        <div class="bg-red-50 p-2 rounded text-center">
+                                            <div class="font-bold">Relations</div>
+                                            <div class="text-gray-600">1.2M</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- LLM Framework -->
+                        <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-lg">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-red-600 p-3 rounded-lg mr-3">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800 text-lg">LLM Framework mit RAG-Modul</h3>
+                                    <p class="text-sm text-gray-600">Intelligente Informationsverarbeitung mit modernster KI</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow" onclick="showModal('rag')">
+                                    <svg class="w-6 h-6 text-red-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">RAG</p>
+                                    <p class="text-xs text-gray-500">Retrieval-Augmented</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-6 h-6 text-red-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Embeddings</p>
+                                    <p class="text-xs text-gray-500">Cosine Similarity</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                                    <svg class="w-6 h-6 text-red-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Dynamisch</p>
+                                    <p class="text-xs text-gray-500">Info-Suche</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow" onclick="showModal('prompt')">
+                                    <svg class="w-6 h-6 text-red-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    <p class="text-sm font-medium">Prompts</p>
+                                    <p class="text-xs text-gray-500">Management</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Use Cases Section -->
+            <div class="mt-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 shadow-lg border border-indigo-200">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-600 p-3 rounded-lg mr-3">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800">💡 Anwendungsfälle (Use Cases)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="showUseCase('traffic')">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800 mb-1">Echtzeit-Analyse der Verkehrslage</h3>
+                                <p class="text-sm text-gray-600">Kombination von Verkehrs- und Luftqualitätsdaten für bessere Stadtplanung</p>
+                                <div class="mt-3 flex items-center text-indigo-600">
+                                    <span class="text-sm font-medium">Demo ansehen</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="showUseCase('risk')">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800 mb-1">Automatisierte Risikoabschätzungen</h3>
+                                <p class="text-sm text-gray-600">KI-gestützte Analyse von Bauprojekten zur frühzeitigen Risikoerkennung</p>
+                                <div class="mt-3 flex items-center text-indigo-600">
+                                    <span class="text-sm font-medium">Demo ansehen</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="showUseCase('citizen')">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800 mb-1">Intelligente Bürgeranfragen</h3>
+                                <p class="text-sm text-gray-600">GPT-basierter Chatbot für 24/7 Bürgerkommunikation</p>
+                                <div class="mt-3 flex items-center text-indigo-600">
+                                    <span class="text-sm font-medium">Demo ansehen</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="showUseCase('procurement')">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800 mb-1">Predictive Procurement</h3>
+                                <p class="text-sm text-gray-600">Nachhaltige Beschaffung durch vorausschauende Analyse</p>
+                                <div class="mt-3 flex items-center text-indigo-600">
+                                    <span class="text-sm font-medium">Demo ansehen</span>
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="mt-8 bg-white rounded-xl p-6 shadow-lg">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">🎮 Steuerung</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button onclick="expandAll()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"></path>
+                        </svg>
+                        Alle erweitern
+                    </button>
+                    <button onclick="collapseAll()" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19l7-7 7 7"></path>
+                        </svg>
+                        Alle einklappen
+                    </button>
+                    <button onclick="startTour()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Geführte Tour
+                    </button>
+                    <button onclick="showSettings()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Einstellungen
+                    </button>
+                </div>
+                
+                <!-- Quick Layer Access -->
+                <div class="mt-6">
+                    <h3 class="text-sm font-medium text-gray-600 mb-3">Schnellzugriff auf Layer:</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="highlightLayer('layer5')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-full text-sm transition-colors">
+                            Interface Layer
+                        </button>
+                        <button onclick="highlightLayer('layer1')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-sm transition-colors">
+                            Governance Layer
+                        </button>
+                        <button onclick="highlightLayer('layer2')" class="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-full text-sm transition-colors">
+                            Agentic Layer
+                        </button>
+                        <button onclick="highlightLayer('layer3')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-4 py-2 rounded-full text-sm transition-colors">
+                            Data Mesh Layer
+                        </button>
+                        <button onclick="highlightLayer('layer4')" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-full text-sm transition-colors">
+                            Data Platform Layer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-6 rounded-lg">
+                <div class="flex">
+                    <div class="mr-3">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-blue-800 mb-2">Über diese Architektur</h3>
+                        <p class="text-sm text-blue-700">
+                            Diese interaktive Visualisierung zeigt die Agentic Data Mesh Architektur für urbane Datenökosysteme.
+                            Klicken Sie auf die einzelnen Ebenen für detaillierte Informationen oder nutzen Sie die Steuerungselemente
+                            für eine optimale Übersicht. Die Architektur kombiniert moderne KI-Technologien mit bewährten 
+                            Data-Mesh-Prinzipien für eine nachhaltige und skalierbare Datenverwaltung.
+                        </p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="bg-white px-3 py-1 rounded-full text-xs text-blue-700">Version 2.0</span>
+                            <span class="bg-white px-3 py-1 rounded-full text-xs text-blue-700">Stand: 2024</span>
+                            <span class="bg-white px-3 py-1 rounded-full text-xs text-blue-700">EU-konform</span>
+                            <span class="bg-white px-3 py-1 rounded-full text-xs text-blue-700">DSGVO-kompatibel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-gray-400">© 2024 Agentic Data Mesh Architecture. Alle Rechte vorbehalten.</p>
+            <div class="mt-4 flex justify-center space-x-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Dokumentation</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">GitHub</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Support</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Kontakt</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Progress Bar -->
+    <div id="progressBar" class="progress-bar" style="display: none;">
+        <div class="flex items-center">
+            <div class="mr-3">
+                <svg class="w-6 h-6 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <p class="font-medium text-gray-800" id="progressText">Verarbeite Anfrage...</p>
+                <div class="w-48 bg-gray-200 rounded-full h-2 mt-2">
+                    <div id="progressFill" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modalTitle" class="text-2xl font-bold text-gray-800"></h2>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="text-gray-700">
+                <!-- Content will be inserted here -->
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg transition-colors">
+                    Schließen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hide loading overlay when page is loaded
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Toggle layer expansion
+        function toggleLayer(layerId) {
+            const layer = document.getElementById(layerId);
+            layer.classList.toggle('expanded');
+            
+            // Show a subtle animation
+            layer.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                layer.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Expand all layers
+        function expandAll() {
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach((layer, index) => {
+                setTimeout(() => {
+                    layer.classList.add('expanded');
+                }, index * 100);
+            });
+            showNotification('Alle Layer wurden erweitert');
+        }
+
+        // Collapse all layers
+        function collapseAll() {
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach((layer, index) => {
+                setTimeout(() => {
+                    layer.classList.remove('expanded');
+                }, index * 100);
+            });
+            showNotification('Alle Layer wurden eingeklappt');
+        }
+
+        // Highlight specific layer
+        function highlightLayer(layerId) {
+            // Remove all active states
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach(layer => {
+                layer.classList.remove('active-layer');
+            });
+            
+            // Highlight selected layer
+            const layer = document.getElementById(layerId);
+            layer.classList.add('active-layer');
+            
+            // Expand if not already
+            if (!layer.classList.contains('expanded')) {
+                toggleLayer(layerId);
+            }
+            
+            // Smooth scroll to layer
+            layer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            showNotification(`${getLayerName(layerId)} wurde hervorgehoben`);
+        }
+
+        // Get layer name
+        function getLayerName(layerId) {
+            const names = {
+                'layer5': 'Interface & Clients Layer',
+                'layer1': 'Governance Layer',
+                'layer2': 'Agentic Layer',
+                'layer3': 'Data Mesh Layer',
+                'layer4': 'Data Platform Layer'
+            };
+            return names[layerId] || 'Layer';
+        }
+
+        // Start guided tour
+        function startTour() {
+            const layers = ['layer5', 'layer1', 'layer2', 'layer3', 'layer4'];
+            let currentIndex = 0;
+            
+            collapseAll();
+            
+            const tourInterval = setInterval(() => {
+                if (currentIndex < layers.length) {
+                    highlightLayer(layers[currentIndex]);
+                    currentIndex++;
+                } else {
+                    clearInterval(tourInterval);
+                    showNotification('Tour beendet');
+                }
+            }, 3000);
+            
+            showNotification('Geführte Tour gestartet');
+        }
+
+        // Show settings
+        function showSettings() {
+            showModal('settings');
+        }
+
+        // Show modal
+        function showModal(type) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            const content = {
+                'info': {
+                    title: 'Über Agentic Data Mesh',
+                    content: `
+                        <div class="space-y-4">
+                            <p>Die Agentic Data Mesh Architektur ist ein innovativer Ansatz zur Verwaltung urbaner Datenökosysteme. Sie kombiniert:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Dezentrale Datenverwaltung:</strong> Jede Domäne verwaltet ihre eigenen Daten</li>
+                                <li><strong>KI-gestützte Automatisierung:</strong> Intelligente Agenten übernehmen Routineaufgaben</li>
+                                <li><strong>Föderierte Governance:</strong> Zentrale Standards, lokale Implementierung</li>
+                                <li><strong>Moderne Technologie:</strong> Cloud-native Infrastruktur mit Azure</li>
+                            </ul>
+                            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-2">Vorteile:</h3>
+                                <ul class="text-sm space-y-1 text-blue-700">
+                                    <li>✓ Skalierbare Datenarchitektur</li>
+                                    <li>✓ Reduzierte Komplexität</li>
+                                    <li>✓ Verbesserte Datenqualität</li>
+                                    <li>✓ Schnellere Innovation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                'monitoring': {
+                    title: 'KI-Agent Monitoring Dashboard',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-green-800">Aktive Agenten</h4>
+                                    <p class="text-3xl font-bold text-green-600">12</p>
+                                    <p class="text-sm text-gray-600">Alle funktionieren normal</p>
+                                </div>
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-yellow-800">Warnungen</h4>
+                                    <p class="text-3xl font-bold text-yellow-600">3</p>
+                                    <p class="text-sm text-gray-600">Niedrige Priorität</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Agent Performance</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span>Projektanalyse-Agent</span>
+                                        <span class="text-green-600">98% Effizienz</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Risikoagent</span>
+                                        <span class="text-green-600">95% Effizienz</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Beschaffungs-Agent</span>
+                                        <span class="text-yellow-600">87% Effizienz</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'rag': {
+                    title: 'RAG (Retrieval-Augmented Generation)',
+                    content: `
+                        <div class="space-y-4">
+                            <p>RAG kombiniert die Stärken von Informationsabruf und Textgenerierung für präzise, kontextbezogene Antworten.</p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">So funktioniert's:</h4>
+                                <ol class="list-decimal pl-6 space-y-2">
+                                    <li>Nutzeranfrage wird analysiert</li>
+                                    <li>Relevante Dokumente werden aus der Wissensdatenbank abgerufen</li>
+                                    <li>Kontext wird an das LLM übergeben</li>
+                                    <li>Präzise Antwort wird generiert</li>
+                                </ol>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-800 mb-2">Live Demo:</h4>
+                                <input type="text" placeholder="Stellen Sie eine Frage..." class="w-full p-2 border rounded mb-2">
+                                <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                                    Anfrage senden
+                                </button>
+                            </div>
+                        </div>
+                    `
+                },
+                'prompt': {
+                    title: 'Prompt Management System',
+                    content: `
+                        <div class="space-y-4">
+                            <p>Zentrale Verwaltung aller AI-Prompts für konsistente und optimierte Ergebnisse.</p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Prompt Templates:</h4>
+                                <div class="space-y-3">
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Datenanalyse-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Analysiere die folgenden Daten und erstelle eine Zusammenfassung...</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Risikobewertung-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Bewerte die Risiken basierend auf den folgenden Faktoren...</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Bürgeranfrage-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Beantworte die folgende Anfrage freundlich und kompetent...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'settings': {
+                    title: 'Einstellungen',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Anzeige-Optionen:</h4>
+                                <div class="space-y-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-3">
+                                        <span>Animationen aktivieren</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-3">
+                                        <span>Tooltips anzeigen</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span>Kompakte Ansicht</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Sprache:</h4>
+                                <select class="w-full p-2 border rounded">
+                                    <option>Deutsch</option>
+                                    <option>English</option>
+                                    <option>Français</option>
+                                </select>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            if (content[type]) {
+                modalTitle.textContent = content[type].title;
+                modalContent.innerHTML = content[type].content;
+                modal.style.display = 'block';
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Show demo
+        function showDemo(type) {
+            showProgress('Demo wird geladen...');
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} Demo wurde gestartet`);
+            }, 1500);
+        }
+
+        // Show agent demo
+        function showAgentDemo(agentType) {
+            showProgress(`${agentType} Agent wird aktiviert...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${agentType} Agent ist jetzt aktiv`);
+            }, 2000);
+        }
+
+        // Show data domain
+        function showDataDomain(domain) {
+            showProgress(`${domain} Daten werden geladen...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${domain} Datendomäne geladen`);
+            }, 1500);
+        }
+
+        // Show use case
+        function showUseCase(useCase) {
+            showProgress(`Use Case "${useCase}" wird vorbereitet...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`Use Case "${useCase}" Demo gestartet`);
+            }, 1500);
+        }
+
+        // Export architecture
+        function exportArchitecture() {
+            showProgress('Architektur wird exportiert...');
+            setTimeout(() => {
+                hideProgress();
+                showNotification('Export als PDF wurde gestartet');
+                // In real implementation, this would trigger a PDF download
+            }, 2000);
+        }
+
+        // Show progress
+        function showProgress(text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            progressText.textContent = text;
+            progressBar.style.display = 'block';
+            
+            // Animate progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                }
+            }, 150);
+        }
+
+        // Hide progress
+        function hideProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }, 300);
+        }
+
+        // Modal click outside to close
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize tooltips and other interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to components
+            const components = document.querySelectorAll('.component');
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                component.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+							<script>
+                            	
+        // Hide loading overlay when page is loaded
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Toggle layer expansion
+        function toggleLayer(layerId) {
+            const layer = document.getElementById(layerId);
+            layer.classList.toggle('expanded');
+            
+            // Show a subtle animation
+            layer.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                layer.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Expand all layers
+        function expandAll() {
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach((layer, index) => {
+                setTimeout(() => {
+                    layer.classList.add('expanded');
+                }, index * 100);
+            });
+            showNotification('Alle Layer wurden erweitert');
+        }
+
+        // Collapse all layers
+        function collapseAll() {
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach((layer, index) => {
+                setTimeout(() => {
+                    layer.classList.remove('expanded');
+                }, index * 100);
+            });
+            showNotification('Alle Layer wurden eingeklappt');
+        }
+
+        // Highlight specific layer
+        function highlightLayer(layerId) {
+            // Remove all active states
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach(layer => {
+                layer.classList.remove('active-layer');
+            });
+            
+            // Highlight selected layer
+            const layer = document.getElementById(layerId);
+            layer.classList.add('active-layer');
+            
+            // Expand if not already
+            if (!layer.classList.contains('expanded')) {
+                toggleLayer(layerId);
+            }
+            
+            // Smooth scroll to layer
+            layer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            showNotification(`${getLayerName(layerId)} wurde hervorgehoben`);
+        }
+
+        // Get layer name
+        function getLayerName(layerId) {
+            const names = {
+                'layer5': 'Interface & Clients Layer',
+                'layer1': 'Governance Layer',
+                'layer2': 'Agentic Layer',
+                'layer3': 'Data Mesh Layer',
+                'layer4': 'Data Platform Layer'
+            };
+            return names[layerId] || 'Layer';
+        }
+
+        // Start guided tour
+        function startTour() {
+            const layers = ['layer5', 'layer1', 'layer2', 'layer3', 'layer4'];
+            let currentIndex = 0;
+            
+            collapseAll();
+            
+            const tourInterval = setInterval(() => {
+                if (currentIndex < layers.length) {
+                    highlightLayer(layers[currentIndex]);
+                    currentIndex++;
+                } else {
+                    clearInterval(tourInterval);
+                    showNotification('Tour beendet');
+                }
+            }, 3000);
+            
+            showNotification('Geführte Tour gestartet');
+        }
+
+        // Show settings
+        function showSettings() {
+            showModal('settings');
+        }
+
+        // Show modal
+        function showModal(type) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            const content = {
+                'info': {
+                    title: 'Über Agentic Data Mesh',
+                    content: `
+                        <div class="space-y-4">
+                            <p>Die Agentic Data Mesh Architektur ist ein innovativer Ansatz zur Verwaltung urbaner Datenökosysteme. Sie kombiniert:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Dezentrale Datenverwaltung:</strong> Jede Domäne verwaltet ihre eigenen Daten</li>
+                                <li><strong>KI-gestützte Automatisierung:</strong> Intelligente Agenten übernehmen Routineaufgaben</li>
+                                <li><strong>Föderierte Governance:</strong> Zentrale Standards, lokale Implementierung</li>
+                                <li><strong>Moderne Technologie:</strong> Cloud-native Infrastruktur mit Azure</li>
+                            </ul>
+                            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-2">Vorteile:</h3>
+                                <ul class="text-sm space-y-1 text-blue-700">
+                                    <li>✓ Skalierbare Datenarchitektur</li>
+                                    <li>✓ Reduzierte Komplexität</li>
+                                    <li>✓ Verbesserte Datenqualität</li>
+                                    <li>✓ Schnellere Innovation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                'monitoring': {
+                    title: 'KI-Agent Monitoring Dashboard',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-green-800">Aktive Agenten</h4>
+                                    <p class="text-3xl font-bold text-green-600">12</p>
+                                    <p class="text-sm text-gray-600">Alle funktionieren normal</p>
+                                </div>
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-yellow-800">Warnungen</h4>
+                                    <p class="text-3xl font-bold text-yellow-600">3</p>
+                                    <p class="text-sm text-gray-600">Niedrige Priorität</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Agent Performance</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span>Projektanalyse-Agent</span>
+                                        <span class="text-green-600">98% Effizienz</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Risikoagent</span>
+                                        <span class="text-green-600">95% Effizienz</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Beschaffungs-Agent</span>
+                                        <span class="text-yellow-600">87% Effizienz</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'rag': {
+                    title: 'RAG (Retrieval-Augmented Generation)',
+                    content: `
+                        <div class="space-y-4">
+                            <p>RAG kombiniert die Stärken von Informationsabruf und Textgenerierung für präzise, kontextbezogene Antworten.</p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">So funktioniert's:</h4>
+                                <ol class="list-decimal pl-6 space-y-2">
+                                    <li>Nutzeranfrage wird analysiert</li>
+                                    <li>Relevante Dokumente werden aus der Wissensdatenbank abgerufen</li>
+                                    <li>Kontext wird an das LLM übergeben</li>
+                                    <li>Präzise Antwort wird generiert</li>
+                                </ol>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-800 mb-2">Live Demo:</h4>
+                                <input type="text" placeholder="Stellen Sie eine Frage..." class="w-full p-2 border rounded mb-2">
+                                <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                                    Anfrage senden
+                                </button>
+                            </div>
+                        </div>
+                    `
+                },
+                'prompt': {
+                    title: 'Prompt Management System',
+                    content: `
+                        <div class="space-y-4">
+                            <p>Zentrale Verwaltung aller AI-Prompts für konsistente und optimierte Ergebnisse.</p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Prompt Templates:</h4>
+                                <div class="space-y-3">
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Datenanalyse-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Analysiere die folgenden Daten und erstelle eine Zusammenfassung...</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Risikobewertung-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Bewerte die Risiken basierend auf den folgenden Faktoren...</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <h5 class="font-medium">Bürgeranfrage-Prompt</h5>
+                                        <p class="text-sm text-gray-600 mt-1">Beantworte die folgende Anfrage freundlich und kompetent...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'settings': {
+                    title: 'Einstellungen',
+                    content: `
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Anzeige-Optionen:</h4>
+                                <div class="space-y-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-3">
+                                        <span>Animationen aktivieren</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-3">
+                                        <span>Tooltips anzeigen</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span>Kompakte Ansicht</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-3">Sprache:</h4>
+                                <select class="w-full p-2 border rounded">
+                                    <option>Deutsch</option>
+                                    <option>English</option>
+                                    <option>Français</option>
+                                </select>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            if (content[type]) {
+                modalTitle.textContent = content[type].title;
+                modalContent.innerHTML = content[type].content;
+                modal.style.display = 'block';
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Show demo
+        function showDemo(type) {
+            showProgress('Demo wird geladen...');
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} Demo wurde gestartet`);
+            }, 1500);
+        }
+
+        // Show agent demo
+        function showAgentDemo(agentType) {
+            showProgress(`${agentType} Agent wird aktiviert...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${agentType} Agent ist jetzt aktiv`);
+            }, 2000);
+        }
+
+        // Show data domain
+        function showDataDomain(domain) {
+            showProgress(`${domain} Daten werden geladen...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${domain} Datendomäne geladen`);
+            }, 1500);
+        }
+
+        // Show use case
+        function showUseCase(useCase) {
+            showProgress(`Use Case "${useCase}" wird vorbereitet...`);
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`Use Case "${useCase}" Demo gestartet`);
+            }, 1500);
+        }
+
+        // Export architecture
+        function exportArchitecture() {
+            showProgress('Architektur wird exportiert...');
+            setTimeout(() => {
+                hideProgress();
+                showNotification('Export als PDF wurde gestartet');
+                // In real implementation, this would trigger a PDF download
+            }, 2000);
+        }
+
+        // Show progress
+        function showProgress(text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            progressText.textContent = text;
+            progressBar.style.display = 'block';
+            
+            // Animate progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                }
+            }, 150);
+        }
+
+        // Hide progress
+        function hideProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }, 300);
+        }
+
+        // Modal click outside to close
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize tooltips and other interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to components
+            const components = document.querySelectorAll('.component');
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                component.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    
+
+							</script>
+                        </body>
+                        </html>
+                    
